@@ -1,6 +1,13 @@
+# --- Framework Backend ---
 fastapi
 uvicorn
 pydantic
+
+# --- AI & LLM ---
+groq
 python-dotenv
 
-groq
+# --- Machine Learning (Rekomendasi) ---
+pandas
+scikit-learn
+numpy
