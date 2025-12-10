@@ -1,0 +1,751 @@
+[
+  {
+    "role_name": "AI Engineer",
+    "description": "Profesional yang membangun dan mengoptimalkan model AI.",
+    "sub_skills": [
+      {
+        "id": "python_data_science",
+        "name": "Python for Data Science",
+        "levels": {
+          "beginner": {
+            "description": "Memahami sintaks dasar Python dan struktur data.",
+            "exam_topics": [
+              "Variables",
+              "Data Types",
+              "List/Dictionary",
+              "Control Flow"
+            ],
+            "recommendation": {
+              "course_name": "Memulai Pemrograman dengan Python",
+              "specific_chapters": [
+                "Variable dan Assignment",
+                "Tipe Data",
+                "Kuis Coding: Variabel dan Assignment"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Mampu menggunakan fungsi, loop kompleks, dan OOP dasar.",
+            "exam_topics": [
+              "Functions",
+              "Loops",
+              "Object-Oriented Programming (OOP)"
+            ],
+            "recommendation": {
+              "course_name": "Memulai Pemrograman dengan Python",
+              "specific_chapters": [
+                "Fungsi",
+                "Perulangan",
+                "Pengenalan Kelas",
+                "Kuis Object-Oriented Programming (OOP)"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Menguasai library data, unit testing, dan style guide.",
+            "exam_topics": [
+              "Unit Testing",
+              "Matriks",
+              "Library Pengolahan Data"
+            ],
+            "recommendation": {
+              "course_name": "Memulai Pemrograman dengan Python",
+              "specific_chapters": [
+                "Pengantar Unit Testing",
+                "Implementasi Matriks pada Python",
+                "Library Machine Learning"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ml_fundamentals",
+        "name": "Machine Learning Fundamentals",
+        "levels": {
+          "beginner": {
+            "description": "Paham konsep dasar AI, Machine Learning, dan Taksonomi.",
+            "exam_topics": [
+              "AI Taxonomy",
+              "Supervised vs Unsupervised",
+              "Data Splitting"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Dasar AI",
+              "specific_chapters": [
+                "Taksonomi AI",
+                "Tipe-Tipe Machine Learning",
+                "Machine Learning Workflow"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Mampu menangani regresi, klasifikasi, dan data cleaning.",
+            "exam_topics": [
+              "Linear Regression",
+              "Decision Tree",
+              "Handling Missing Value",
+              "Overfitting"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Machine Learning untuk Pemula",
+              "specific_chapters": [
+                "Rangkuman Supervised Learning - Regresi",
+                "Decision Tree",
+                "Penanganan Outlier",
+                "Metode Deteksi Overfitting dan Underfitting"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Menguasai unsupervised learning, tuning, dan evaluasi model kompleks.",
+            "exam_topics": [
+              "Clustering (K-Means/DBSCAN)",
+              "Hyperparameter Tuning (Grid Search)",
+              "Dimensionality Reduction (PCA)"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Machine Learning untuk Pemula",
+              "specific_chapters": [
+                "K-Means Clustering",
+                "DBSCAN",
+                "Grid Search",
+                "Dimensionality Reduction : LDA, PCA, dan t-SNE"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "computer_vision",
+        "name": "Computer Vision",
+        "levels": {
+          "beginner": {
+            "description": "Paham dasar CNN dan pengolahan citra sederhana.",
+            "exam_topics": [
+              "CNN Architecture",
+              "Convolutions",
+              "Pooling",
+              "Image Preprocessing"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Deep Learning",
+              "specific_chapters": [
+                "Dasar-Dasar Convolutional Neural Networks (CNNs)",
+                "Pembuatan Model Klasifikasi Gambar dengan CNN",
+                "Image Generation"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Mampu melakukan Transfer Learning dan Object Detection dasar.",
+            "exam_topics": [
+              "Transfer Learning",
+              "Object Detection Concepts",
+              "Dropout/Batch Normalization"
+            ],
+            "recommendation": {
+              "course_name": "Machine Learning Terapan",
+              "specific_chapters": [
+                "Pengenalan Transfer Learning",
+                "Pengenalan Object Detection",
+                "Teknik-teknik Object Detection"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Menguasai segmentasi gambar dan kustomisasi model visual.",
+            "exam_topics": [
+              "Image Segmentation",
+              "Advanced Object Detection",
+              "Custom Loss for Vision"
+            ],
+            "recommendation": {
+              "course_name": "Membangun Proyek Deep Learning Tingkat Mahir",
+              "specific_chapters": [
+                "Image Segmentation dengan Deep Learning",
+                "Klasifikasi Gambar Lanjutan",
+                "Berkenalan dengan Object Detection"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "nlp",
+        "name": "Natural Language Processing (NLP)",
+        "levels": {
+          "beginner": {
+            "description": "Dasar pemrosesan teks, tokenisasi, dan klasifikasi teks sederhana.",
+            "exam_topics": [
+              "Tokenization",
+              "Text Cleaning",
+              "Binary Classification"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Deep Learning",
+              "specific_chapters": [
+                "Pengenalan Natural Language Processing",
+                "Latihan Pra-pemrosesan Teks",
+                "Binary vs Multiclass vs Multilabel Classification pada Text"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Memahami RNN, LSTM, dan Analisis Sentimen.",
+            "exam_topics": [
+              "RNN",
+              "LSTM",
+              "Sentiment Analysis",
+              "Word Embeddings"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Deep Learning",
+              "specific_chapters": [
+                "Pengenalan Recurrent Neural Network",
+                "Algoritma RNN",
+                "Proyek Analisis Sentimen"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Menguasai Transformers, Attention Mechanism, dan NLU lanjutan.",
+            "exam_topics": [
+              "Transformers",
+              "Attention Mechanism",
+              "Sequence to Sequence",
+              "IndoNLU"
+            ],
+            "recommendation": {
+              "course_name": "Membangun Proyek Deep Learning Tingkat Mahir",
+              "specific_chapters": [
+                "Mengenal Transformer dalam NLP",
+                "Latihan Membangun Model Transformer Milik Kita Sendiri",
+                "Pengenalan IndoNLU"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "time_series",
+        "name": "Time Series Analysis",
+        "levels": {
+          "beginner": {
+            "description": "Konsep dasar data deret waktu dan preprocessing.",
+            "exam_topics": [
+              "Time Series Basics",
+              "Trend & Seasonality",
+              "Data Splitting for Time Series"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Deep Learning",
+              "specific_chapters": [
+                "Pengenalan Time Series",
+                "Data Preprocessing untuk Time Series",
+                "Tipe-Tipe Time Series"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Membuat model forecasting menggunakan LSTM.",
+            "exam_topics": [
+              "LSTM for Time Series",
+              "Windowing",
+              "MAE/Huber Loss"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Deep Learning",
+              "specific_chapters": [
+                "Machine Learning pada Time Series",
+                "Proyek Kedua : Membuat Model Machine Learning dengan Data Time Series"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Analisis Time Series tingkat lanjut dengan kustomisasi.",
+            "exam_topics": [
+              "Advanced Preprocessing",
+              "Custom Model for Time Series"
+            ],
+            "recommendation": {
+              "course_name": "Membangun Proyek Deep Learning Tingkat Mahir",
+              "specific_chapters": [
+                "Eksplorasi Data dalam Time Series",
+                "Data Preprocessing Lanjutan Untuk Time Series",
+                "Latihan Custom Model... pada Time Series Model"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "recommender_system",
+        "name": "Recommender Systems",
+        "levels": {
+          "beginner": {
+            "description": "Memahami konsep Content-Based Filtering.",
+            "exam_topics": [
+              "Content-Based Filtering",
+              "TF-IDF",
+              "Cosine Similarity"
+            ],
+            "recommendation": {
+              "course_name": "Machine Learning Terapan",
+              "specific_chapters": [
+                "Pengenalan Sistem Rekomendasi",
+                "Content Based Filtering",
+                "Feature Engineering dengan TF-IDF"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Memahami Collaborative Filtering.",
+            "exam_topics": [
+              "Collaborative Filtering",
+              "User-Item Matrix",
+              "Embedding Layers"
+            ],
+            "recommendation": {
+              "course_name": "Machine Learning Terapan",
+              "specific_chapters": [
+                "Collaborative Filtering",
+                "Model Development dengan Collaborative Filtering"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Sistem rekomendasi Hybrid dan Neural Collaborative Filtering.",
+            "exam_topics": [
+              "Hybrid Recommender",
+              "Neural Collaborative Filtering",
+              "TensorFlow Recommenders"
+            ],
+            "recommendation": {
+              "course_name": "Membangun Proyek Deep Learning Tingkat Mahir",
+              "specific_chapters": [
+                "Neural Collaborative Filtering",
+                "Retrieval dalam Sistem Rekomendasi",
+                "Hybrid Recommender System"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "mlops_deployment",
+        "name": "MLOps & Deployment",
+        "levels": {
+          "beginner": {
+            "description": "Menyimpan model dan penggunaan TF Lite.",
+            "exam_topics": ["Saving Models (H5/SavedModel)", "TF Lite Basics"],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Deep Learning",
+              "specific_chapters": [
+                "Format Penyimpanan Model",
+                "Pengenalan TensorFlow Lite",
+                "Latihan: Deploy Model ML Menggunakan TensorFlow Lite"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Deployment web (TFJS) dan Serving.",
+            "exam_topics": ["TensorFlow.js", "TF Serving", "Model Conversion"],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Deep Learning",
+              "specific_chapters": [
+                "Pengenalan TensorFlow.js",
+                "Pengenalan TensorFlow Serving",
+                "Latihan: Deploy Model ML Menggunakan TensorFlow.js"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Distributed training dan kustomisasi loop training.",
+            "exam_topics": [
+              "Distributed Training",
+              "Custom Training Loops",
+              "TensorFlow Extended (TFX) concepts"
+            ],
+            "recommendation": {
+              "course_name": "Membangun Proyek Deep Learning Tingkat Mahir",
+              "specific_chapters": [
+                "Strategi Distributed Training dengan TensorFlow",
+                "Custom Training Loop",
+                "Reproducibility dalam TensorFlow"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "role_name": "Front-End Web Developer",
+    "description": "Pengembang yang fokus pada antarmuka visual dan interaksi pengguna di browser.",
+    "sub_skills": [
+      {
+        "id": "html_css_fundamentals",
+        "name": "HTML & CSS Fundamentals",
+        "levels": {
+          "beginner": {
+            "description": "Struktur dasar HTML5 dan styling CSS dasar.",
+            "exam_topics": [
+              "Semantic HTML",
+              "Box Model",
+              "Selectors",
+              "Text Styling"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Dasar Pemrograman Web",
+              "specific_chapters": [
+                "Semantic HTML: Header, Footer, Main, dan Nav",
+                "Box Model",
+                "Selector Dasar"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Layouting modern dengan Flexbox dan Positioning.",
+            "exam_topics": [
+              "Flexbox",
+              "Positioning (Relative/Absolute)",
+              "Floats"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Dasar Pemrograman Web",
+              "specific_chapters": [
+                "Pengantar Flexbox",
+                "Positioning",
+                "Latihan: Implementasi Flexbox pada Halaman Profil"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Layout Grid kompleks dan Desain Responsif.",
+            "exam_topics": ["CSS Grid", "Media Queries", "Responsive Design"],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Front-End Web Development",
+              "specific_chapters": [
+                "Pengantar CSS Grid",
+                "Grid Container dan Grid Item",
+                "Media Query",
+                "Responsive Layout"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "javascript_core",
+        "name": "JavaScript Core Logic",
+        "levels": {
+          "beginner": {
+            "description": "Sintaks dasar JS, tipe data, dan logika dasar.",
+            "exam_topics": [
+              "Variables",
+              "Data Types",
+              "Operators",
+              "Functions"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Dasar Pemrograman JavaScript",
+              "specific_chapters": [
+                "Variabel",
+                "Tipe Data",
+                "Logika Operator dan If Else",
+                "Function"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Manipulasi struktur data dan OOP dasar.",
+            "exam_topics": ["Arrays", "Objects", "Map/Set", "Basic OOP"],
+            "recommendation": {
+              "course_name": "Belajar Dasar Pemrograman JavaScript",
+              "specific_chapters": [
+                "Menstrukturkan Data dengan Object",
+                "Array",
+                "Map",
+                "Pengenalan OOP"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Konsep ES6+, Functional Programming, dan Module.",
+            "exam_topics": [
+              "ES6 Modules",
+              "Arrow Functions",
+              "Higher Order Functions",
+              "Destructuring"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Dasar Pemrograman JavaScript",
+              "specific_chapters": [
+                "ES6 Module",
+                "Arrow Function",
+                "Destructuring Object & Array",
+                "Functional Programming"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "dom_events",
+        "name": "DOM Manipulation & Interactivity",
+        "levels": {
+          "beginner": {
+            "description": "Memilih elemen dan event dasar.",
+            "exam_topics": [
+              "getElementById/querySelector",
+              "Click Events",
+              "Basic DOM Manipulation"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Membuat Front-End Web untuk Pemula",
+              "specific_chapters": [
+                "Mencari DOM",
+                "Manipulasi Konten Melalui innerText",
+                "Menambahkan Event Handler"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Event bubbling, form handling, dan membuat elemen dinamis.",
+            "exam_topics": [
+              "Event Bubbling",
+              "Form Events",
+              "Creating Elements"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Membuat Front-End Web untuk Pemula",
+              "specific_chapters": [
+                "Event Bubbling dan Capturing",
+                "Form Event",
+                "Membuat Elemen HTML"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Web Storage (Local/Session) dan Custom Events.",
+            "exam_topics": [
+              "LocalStorage",
+              "SessionStorage",
+              "JSON Parsing",
+              "Custom Events"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Membuat Front-End Web untuk Pemula",
+              "specific_chapters": [
+                "Pengertian dan Fungsi Web Storage",
+                "Implementasi Web Storage",
+                "Custom Event"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "async_api",
+        "name": "Asynchronous & API",
+        "levels": {
+          "beginner": {
+            "description": "Konsep dasar Async dan Callback.",
+            "exam_topics": [
+              "Synchronous vs Asynchronous",
+              "Callbacks",
+              "setTimeout"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Dasar Pemrograman JavaScript",
+              "specific_chapters": [
+                "Apa Itu Asynchronous Process",
+                "Penanganan dengan Callback",
+                "setTimeout"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Promise dan Fetch API dasar.",
+            "exam_topics": ["Promise", "Fetch API Basics", "JSON Data"],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Front-End Web Development",
+              "specific_chapters": [
+                "Promise",
+                "Dasar Penggunaan Fetch",
+                "Mengonsumsi Data API"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Async/Await, Error Handling, dan Chaining.",
+            "exam_topics": [
+              "Async/Await",
+              "Try/Catch",
+              "Promise.all",
+              "Chaining"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Front-End Web Development",
+              "specific_chapters": [
+                "Sintaks Async/Await",
+                "Error Handling pada Async",
+                "Promise Berantai"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "web_components",
+        "name": "Front-End Architecture (Web Components)",
+        "levels": {
+          "beginner": {
+            "description": "Konsep dasar Custom Elements.",
+            "exam_topics": ["Custom Elements", "HTMLElement Class"],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Front-End Web Development",
+              "specific_chapters": [
+                "Apa Itu Web Component",
+                "Basic Custom Element"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Shadow DOM dan Template.",
+            "exam_topics": ["Shadow DOM", "Templates", "Encapsulation"],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Front-End Web Development",
+              "specific_chapters": [
+                "Pengantar Shadow DOM",
+                "Shadow DOM untuk Web Component"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Lifecycle Callbacks dan Slots.",
+            "exam_topics": [
+              "connectedCallback",
+              "attributeChangedCallback",
+              "Slots"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Fundamental Front-End Web Development",
+              "specific_chapters": [
+                "Siklus Hidup (Lifecycle)",
+                "Fleksibel dengan Slot Element"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "pwa_performance",
+        "name": "PWA & Performance Optimization",
+        "levels": {
+          "beginner": {
+            "description": "Dasar PWA dan Manifest.",
+            "exam_topics": ["Web App Manifest", "Service Worker Basics"],
+            "recommendation": {
+              "course_name": "Belajar Pengembangan Web Intermediate",
+              "specific_chapters": [
+                "Pengenalan Progressive Web Apps",
+                "Web App Manifest",
+                "Registrasi Service Worker"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Caching dan Workbox.",
+            "exam_topics": [
+              "Cache API",
+              "Workbox",
+              "Caching Strategies (StaleWhileRevalidate)"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Pengembangan Web Intermediate",
+              "specific_chapters": [
+                "Workbox Precaching",
+                "Caching Strategies",
+                "Latihan: Offline Capability dengan Workbox"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "Optimasi performa, Lazy Loading, dan Web Vitals.",
+            "exam_topics": [
+              "Image Optimization",
+              "Lazy Loading",
+              "Web Vitals (LCP, FID, CLS)",
+              "Bundle Analyzer"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Pengembangan Web Intermediate",
+              "specific_chapters": [
+                "Image Optimization",
+                "Menggunakan Lazy Loading Image",
+                "Web Vitals",
+                "Bundle Analyzer"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "testing_automation",
+        "name": "Testing & Automation",
+        "levels": {
+          "beginner": {
+            "description": "Dasar pengujian manual dan konsep testing.",
+            "exam_topics": [
+              "Why Testing?",
+              "Manual vs Automated",
+              "Types of Testing"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Dasar Pemrograman JavaScript",
+              "specific_chapters": [
+                "Pengenalan JavaScript Testing",
+                "Pengujian Program"
+              ]
+            }
+          },
+          "intermediate": {
+            "description": "Unit Testing dan Integration Testing.",
+            "exam_topics": [
+              "Jest",
+              "Unit Testing",
+              "Integration Testing",
+              "TDD"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Pengembangan Web Intermediate",
+              "specific_chapters": [
+                "TDD Menggunakan Jest",
+                "Framework Automation Testing",
+                "Menulis Kode Pengujian"
+              ]
+            }
+          },
+          "advanced": {
+            "description": "E2E Testing dan CI/CD.",
+            "exam_topics": [
+              "End-to-End Testing",
+              "CI/CD Concepts",
+              "GitHub Actions"
+            ],
+            "recommendation": {
+              "course_name": "Belajar Pengembangan Web Intermediate",
+              "specific_chapters": [
+                "Kasus 5: End-to-End Testing",
+                "Pendahuluan Continuous Integration & Continuous Deployment",
+                "Latihan: Membuat CI Pipeline menggunakan GitHub Action"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+]
