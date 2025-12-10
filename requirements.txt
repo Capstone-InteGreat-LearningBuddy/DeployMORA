@@ -1,16 +1,11 @@
-# --- Framework Backend ---
 fastapi
 uvicorn
 pydantic
-
-# --- AI & LLM ---
 groq
 python-dotenv
-
-# --- Machine Learning (Rekomendasi) ---
 pandas
-scikit-learn==1.6.1
 numpy
+scikit-learn==1.6.1
 
 
 
