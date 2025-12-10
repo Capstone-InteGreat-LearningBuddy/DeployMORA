@@ -1,6 +1,6 @@
 # --- Framework Backend ---
 fastapi
-uvicorn
+
 pydantic
 
 # --- AI & LLM ---
@@ -11,4 +11,5 @@ python-dotenv
 pandas
 scikit-learn==1.6.1
 numpy
+
 
