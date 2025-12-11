@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-pydantic
-groq
-python-dotenv
-pandas
-numpy
-scikit-learn==1.6.1
