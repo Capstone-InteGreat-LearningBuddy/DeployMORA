@@ -7,6 +7,8 @@ import pickle
 import ast
 import os
 from sklearn.metrics.pairwise import linear_kernel
+from app.services.psych_service import psych_service
+from typing import List
 
 app = FastAPI(title="MORA - AI Learning Assistant (Final)")
 
@@ -126,46 +128,75 @@ def get_recommendations(user: schemas.UserProfile):
     return final_recs[:5] # Kembalikan Top 5
 
 # --- 3. ENDPOINT CHAT ROUTER ---
+# app/main.py (Bagian process_chat saja)
+
 @app.post("/chat/process", response_model=schemas.ChatResponse)
 async def process_chat(req: schemas.ChatRequest):
-    # Ambil silabus skill berdasarkan role user untuk konteks AI
+    # 1. Ambil data role
     role_data = skill_manager.get_role_data(req.role)
-    skill_names = [s['name'] for s in role_data['sub_skills']] if role_data else []
+    # --- [UPDATE BARU: Ektrak Silabus Lengkap] ---
+    # Kita buat string rapi berisi Skill + Topik-topiknya
+    syllabus_list = []
+    if role_data:
+        for s in role_data['sub_skills']:
+            # Ambil nama skill utama
+            skill_name = s['name']
+            
+            # Kumpulkan semua exam_topics dari level beginner, intermediate, advanced
+            all_topics = []
+            for lvl_key, lvl_data in s['levels'].items():
+                topics = lvl_data.get('exam_topics', [])
+                all_topics.extend(topics)
+            
+            # Hapus duplikat topik dan gabungkan jadi string
+            unique_topics = list(set(all_topics))
+            topic_str = ", ".join(unique_topics)
+            
+            syllabus_list.append(f"TOPIC {skill_name}: [{topic_str}]")
     
-    # Klasifikasi Niat User (Router LLM)
+    # Variable ini yang nanti dikirim ke LLM
+    syllabus_context = "\n".join(syllabus_list)
+    # ---------------------------------------------
+    skill_names = [s['name'] for s in role_data['sub_skills']] if role_data else []
+
+    # 2. Router
     intent = await llm_engine.process_user_intent(req.message, skill_names)
     
     action = intent.get('action')
-
-    detected_skills = intent.get('detected_skills', []) 
+    # PERUBAHAN 1: Ambil List skills, bukan single skill
+    detected_skills_list = intent.get('detected_skills', [])
     
+    final_reply = ""
+    response_data = None
+    
+    # 3. Logic
     if action == "START_EXAM":
         target_skill_ids = []
         
-        # 1. Cari ID untuk SEMUA skill yang dideteksi
-        if detected_skills and role_data:
-            for ds in detected_skills:
+        # A. Cari ID untuk SEMUA skill yang dideteksi (Looping)
+        if detected_skills_list and role_data:
+            for ds in detected_skills_list:
                 for s in role_data['sub_skills']:
                     # Cek kemiripan nama
                     if s['name'].lower() in ds.lower() or ds.lower() in s['name'].lower():
-                        if s['id'] not in target_skill_ids: # Cegah duplikat
+                        if s['id'] not in target_skill_ids:
                             target_skill_ids.append(s['id'])
         
-        # 2. Generate Soal untuk SETIAP Skill ID yang ketemu
+        # B. Jika ada skill yang valid, generate soal untuk MASING-MASING skill
         if target_skill_ids:
-            exam_questions_list = []
+            exam_list = []
             
             for skid in target_skill_ids:
-                # Ambil level user untuk skill ini
+                # Ambil level user
                 user_current_level = req.current_skills.get(skid, "beginner")
                 skill_details = skill_manager.get_skill_details(req.role, skid)
                 level_data = skill_details['levels'].get(user_current_level, skill_details['levels']['beginner'])
                 
-                # Generate Soal via LLM (Tunggu satu-satu)
+                # Generate Soal (Sequential)
                 llm_res = await llm_engine.generate_question(level_data['exam_topics'], user_current_level)
                 
-                # Masukkan ke list
-                exam_questions_list.append({
+                # Masukkan ke list soal
+                exam_list.append({
                     "skill_id": skid,
                     "skill_name": skill_details['name'],
                     "level": user_current_level,
@@ -173,27 +204,30 @@ async def process_chat(req: schemas.ChatRequest):
                     "context": llm_res['grading_rubric']
                 })
             
-            # 3. Kembalikan List Soal di dalam objek 'data'
+            # C. Format Response Baru (Multi-Exam)
             response_data = {
                 "mode": "multiple_exams", # Penanda buat frontend
-                "exams": exam_questions_list
+                "exams": exam_list        # List soal ada di sini
             }
             
-            # Buat kalimat sapaan dinamis
-            skill_names_str = ", ".join([x['skill_name'] for x in exam_questions_list])
-            final_reply = f"Siap! Saya menemukan {len(exam_questions_list)} topik: **{skill_names_str}**. Silakan kerjakan soal-soal berikut di bawah ini! 👇"
-
+            skill_display = ", ".join([x['skill_name'] for x in exam_list])
+            final_reply = f"Siap! Saya siapkan {len(exam_list)} ujian untukmu: **{skill_display}**. Silakan kerjakan satu per satu di bawah ini! 👇"
+            
         else:
-            # Fallback jika skill tidak dikenali
+            # Jika user mau ujian tapi skill ga jelas
             action = "CASUAL_CHAT"
-            final_reply = await llm_engine.casual_chat(req.message, [m.dict() for m in req.history])
+            final_reply = await llm_engine.casual_chat(req.message, [m.dict() for m in req.history], syllabus_context)
+
+    elif action == "START_PSYCH_TEST":
+        response_data = {"trigger_psych_test": True}
+        final_reply = "Tenang, Mora punya tes kepribadian singkat untuk membantumu memilih job role antara **AI Engineer** atau **Front-End Developer**. Yuk coba sekarang! 👇"
+
     elif action == "GET_RECOMMENDATION":
-        # Frontend yang harus lanjut memanggil endpoint /recommendations
         response_data = {"trigger_recommendation": True}
         final_reply = "Sedang menganalisis kebutuhan belajarmu..."
 
     elif action == "CASUAL_CHAT":
-        final_reply = await llm_engine.casual_chat(req.message, [m.dict() for m in req.history])
+        final_reply = await llm_engine.casual_chat(req.message, [m.dict() for m in req.history], syllabus_context)
 
     return schemas.ChatResponse(
         reply=final_reply,
@@ -254,3 +288,32 @@ def get_progress(req: schemas.ProgressRequest):
         })
         
     return progress_report
+
+# ==========================================
+# ENDPOINT PSIKOLOGI (JOB ROLE TEST)
+# ==========================================
+
+@app.get("/psych/questions", response_model=List[schemas.PsychQuestionItem])
+def get_psych_questions():
+    """Mengambil daftar soal tes kepribadian."""
+    return psych_service.get_all_questions()
+
+@app.post("/psych/submit", response_model=schemas.PsychResultResponse)
+async def submit_psych_test(req: schemas.PsychSubmitRequest):
+    """Menerima jawaban user, hitung skor, dan minta analisis LLM."""
+    
+    # 1. Hitung Skor secara matematis
+    result = psych_service.calculate_result(req.answers)
+    
+    winner = result["winner"]
+    scores = result["scores"]
+    traits = result["traits"]
+    
+    # 2. Minta LLM buatkan kata-kata mutiara/analisis
+    analysis_text = await llm_engine.analyze_psych_result(winner, traits)
+    
+    return schemas.PsychResultResponse(
+        suggested_role=winner,
+        analysis=analysis_text,
+        scores=scores
+    )

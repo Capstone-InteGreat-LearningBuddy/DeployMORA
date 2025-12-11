@@ -85,3 +85,21 @@ class ProgressItem(BaseModel):
     current_level: str
     progress_percent: int               # 0 - 100
     remaining_tutorials: int
+
+# ==========================================
+# 5. PSYCH TEST SYSTEM (Fitur Baru)
+# ==========================================
+
+class PsychQuestionItem(BaseModel):
+    id: int
+    question: str
+    options: Dict[str, str] # {"A": "...", "B": "..."}
+
+class PsychSubmitRequest(BaseModel):
+    """Format jawaban yang dikirim user. Key = ID Soal, Value = Pilihan (A/B)"""
+    answers: Dict[int, str]  # Contoh: {1: "A", 2: "B", 3: "A", ...}
+
+class PsychResultResponse(BaseModel):
+    suggested_role: str
+    analysis: str            # Penjelasan dari LLM
+    scores: Dict[str, int]   # Skor detail (misal: AI=3, Frontend=2)
