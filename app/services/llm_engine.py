@@ -3,19 +3,56 @@ import json
 from groq import AsyncGroq
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 class LLMEngine:
     def __init__(self):
-        self.api_key = os.getenv("GROQ_API_KEY")
-        if not self.api_key:
-            raise ValueError("GROQ_API_KEY not found in .env file")
+        self.clients = []
         
-        self.client = AsyncGroq(api_key=self.api_key)
+        key1 = os.getenv("GROQ_API_KEY")
+        if key1:
+            try:
+                self.clients.append(AsyncGroq(api_key=key1))
+            except Exception as e:
+                print(f"⚠️ Gagal memuat Token Utama: {e}")
+
+        key2 = os.getenv("GROQ_API_KEY_BACKUP")
+        if key2:
+            try:
+                self.clients.append(AsyncGroq(api_key=key2))
+            except Exception as e:
+                print(f"⚠️ Gagal memuat Token Backup: {e}")
+            
+        print(f"✅ LLM Engine (Async) siap dengan {len(self.clients)} Client aktif.")
+
+    async def _execute_with_retry(self, messages, model, temperature=0.5, response_format=None):
+        """
+        Mencoba request Async secara bergantian.
+        """
+        if not self.clients:
+            raise Exception("Tidak ada API Key Groq yang terdeteksi di .env!")
+
+        last_error = Exception("Unknown Error")
+
+        for i, client in enumerate(self.clients):
+            try:
+                completion = await client.chat.completions.create(
+                    messages=messages,
+                    model=model,
+                    temperature=temperature,
+                    response_format=response_format
+                )
+                return completion.choices[0].message.content
+
+            except Exception as e:
+                print(f"⚠️ Token ke-{i+1} Gagal. Error: {e}")
+                last_error = e
+                continue
+        
+        print("❌ Semua Token Gagal/Habis.")
+        raise last_error
 
     async def process_user_intent(self, user_text: str, available_skills: list):
-        # Ubah list skill jadi string biar AI tau menu apa aja yang ada
         skills_str = "\n".join([f"- {s}" for s in available_skills])
         
         system_prompt = f"""
@@ -53,27 +90,25 @@ class LLMEngine:
         """
         
         try:
-            chat_completion = await self.client.chat.completions.create(
+            response_content = await self._execute_with_retry(
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_text}
                 ],
-                model="llama-3.3-70b-versatile", # Wajib model 70b biar pinter mapping
-                temperature=0.0, # Wajib 0 agar tidak kreatif/halu
+                model="llama-3.3-70b-versatile",
+                temperature=0.0,
                 response_format={"type": "json_object"}
             )
-            
-            response_content = chat_completion.choices[0].message.content
-            print(f"DEBUG AI MAPPING: {response_content}") # Cek di terminal mappingnya bener gak
             return json.loads(response_content)
         except Exception as e:
-            print(f"Error Intent: {e}")
+            print(f"Error Router: {e}")
             return {"action": "CASUAL_CHAT", "detected_skills": []}
 
     async def generate_question(self, topics: list, level: str):
         topics_str = ", ".join(topics)
         prompt = f"""
-        Buatkan 1 soal esai pendek untuk menguji pemahaman user tentang topik: {topics_str}.
+        Buatkan 1 soal esai pendek dengan konsep how, what, why untuk menguji pemahaman user
+        Tentang topik: {topics_str}.
         Tingkat Kesulitan: {level}.
         Bahasa: Indonesia.
         
@@ -87,15 +122,16 @@ class LLMEngine:
         }}
         """
         try:
-            completion = await self.client.chat.completions.create(
+            response_content = await self._execute_with_retry(
                 messages=[{"role": "user", "content": prompt}],
-                # UPDATE MODEL
                 model="llama-3.3-70b-versatile",
+                temperature=0.5,
                 response_format={"type": "json_object"}
             )
-            return json.loads(completion.choices[0].message.content)
-        except:
-            return None
+            return json.loads(response_content)
+        except Exception as e:
+            print(f"ERROR Generate: {e}")
+            return {"question_text": f"Error generate soal.{e}", "grading_rubric": {}}
 
     async def evaluate_answer(self, user_answer: str, question_context: dict):
         prompt = f"""
@@ -117,47 +153,56 @@ class LLMEngine:
         }}
         """
         try:
-            completion = await self.client.chat.completions.create(
+            response_content = await self._execute_with_retry(
                 messages=[{"role": "user", "content": prompt}],
-                # UPDATE MODEL
                 model="llama-3.3-70b-versatile",
                 response_format={"type": "json_object"}
             )
-            return json.loads(completion.choices[0].message.content)
+            
+            return json.loads(response_content)
         except:
+            print(f"ERROR Evaluate answer: {e}")
             return {"score": 0, "feedback": "Error menilai.", "is_correct": False}
 
-    async def casual_chat(self, user_text: str, history: list = [], syllabus_context: str = ""):
+    async def casual_chat(self, user_text: str, history: list = [], keyword_context: str = "", dataset_status: str = "NOT_FOUND"):
         
+        if dataset_status == "FOUND":
+            system_instruction = f"""
+            [STATUS: VALID]
+            User bertanya tentang topik teknis yang ADA dalam dataset skill kamu: **[{keyword_context}]**.
+            
+            TUGAS:
+            1. Jawab pertanyaan user tentang topik tersebut dengan konseptual yang singkat, padat, dan mudah dimengerti.
+            2. Fokus jawabanmu HANYA pada keyword tersebut.
+            3. Gunakan analogi sederhana jika perlu. Jangan terlalu kaku seperti buku teks, tapi tetap akurat.
+            4. Gaya bahasa: Ramah, Suportif, Mentor IT.
+            5. Giring user untuk menggunakan fitur belajar seperti tanya tentang skill teknis, Ujian/Tes sub skill, cek progres, rekomendasi belajar.
+            """
+        else:
+            # SKENARIO 2: Keyword Tidak Ditemukan (TOLAK)
+            system_instruction = f"""
+            [STATUS: INVALID / OUT OF SCOPE]
+            User bertanya tentang topik yang TIDAK ditemukan dalam 'Skill Keywords Dataset' kamu.
+            
+            TUGAS:
+            1. **TOLAK** untuk menjawab pertanyaan ini.
+            2. Katakan dengan sopan seperti: "Maaf, topik ini tidak ada dalam database skill yang saya pelajari."
+            3. JANGAN mencoba menjawab atau menebak, meskipun kamu tahu jawabannya secara umum. Patuhi whitelist dataset.
+            5. Tawarkan user untuk menggunakan fitur belajar seperti tanya tentang skill teknis, Ujian/Tes sub skill, cek progres, rekomendasi belajar.
+            """
+
         prompt_template = f"""
         [ROLE]
         Namamu MORA. Kamu adalah Mentor & Asisten Teknis Spesialis.
         
-        [PENGETAHUAN & SILABUS KAMU]
-        Kamu HANYA menguasai materi yang tertera di bawah ini. Gunakan daftar ini sebagai acuan validasi jawabanmu:
-        
-        {syllabus_context}
-
-        [TUGAS UTAMA]
-        1. **JAWAB PERTANYAAN TEKNIS:**
-            Jika user bertanya definisi atau konsep tentang topik yang ADA di silabus di atas (misal: "Apa itu List?", "Jelaskan Supervised Learning"), JAWABLAH dengan penjelasan konseptual yang singkat, padat, dan mudah dimengerti (maksimal 3-4 kalimat).
+        {system_instruction}
             
-        2. **GAYA MENGAJAR:**
-            Gunakan analogi sederhana jika perlu. Jangan terlalu kaku seperti buku teks, tapi tetap akurat.
-            
-        3. **BATASAN (BLACK LIST):**
-            - Jika topik TIDAK ADA di silabus (misal: Hardware, IoT, Masak, Mobil, coding selain yang di sylabus), TOLAK dengan sopan dan pivot ke materi silabus.
+        **BATASAN (BLACK LIST):**
+            - Jika topik TIDAK ADA di skill keyword (misal: Mobil, Kendaraan, dll), TOLAK dengan sopan dan pivot ke materi silabus.
             - JANGAN BERIKAN KODE FULL. Jika user minta "Buatkan kodingan", arahkan mereka untuk mengambil Ujian/Tes. Kamu hanya menjelaskan *Konsep* dan *Logika*.
             - Hindari jawaban yang terlalu panjang (lebih dari 4 kalimat).
             - Jika tidak yakin, katakan "Maaf, itu di luar pengetahuan saya."
             - Jangan buat-buat jawaban untuk topik di luar silabus.
-
-        [CONTOH INTERAKSI]
-        User: "Apa itu Supervised Learning?"
-        Mora: (Cek silabus... ada!) "Supervised Learning itu ibarat belajar dengan kunci jawaban. Model dilatih pakai data yang sudah ada labelnya, jadi dia tau mana yang benar dan salah. Contohnya kayak filter email spam!"
-        
-        User: "Gimana cara bikin robot?"
-        Mora: (Cek silabus... tidak ada!) "Waduh, itu ranah hardware/robotik, di luar silabusku. Tapi kalau kamu mau tau cara memprogram otak robotnya pakai Python (AI), aku bisa jelaskan logikanya!"
 
         [PERSONALITY]
         Ramah, Suportif, Emoji secukupnya.
@@ -174,13 +219,13 @@ class LLMEngine:
         messages.append({"role": "user", "content": user_text})
         
         try:
-            completion = await self.client.chat.completions.create(
+            return await self._execute_with_retry(
                 messages=messages,
                 model="llama-3.3-70b-versatile", 
-                temperature=0.3 
+                temperature=0.3
             )
-            return completion.choices[0].message.content
         except Exception as e:
+            print(f"ERROR Casual chat: {e}")
             return f"Maaf, otak saya sedang error. (Error: {str(e)})"
         
 
@@ -209,13 +254,51 @@ class LLMEngine:
         """
         
         try:
-            chat_completion = self.client.chat.completions.create(
+            return await self._execute_with_retry(
                 messages=[{"role": "user", "content": prompt}],
                 model="llama-3.1-8b-instant",
                 temperature=0.7
             )
-            return chat_completion.choices[0].message.content
-        except Exception as e:
-            return f"Berdasarkan jawabanmu, kamu sangat cocok menjadi {role}! Semangat belajar ya! 🚀"
+        except:
+            print(f"ERROR Psych Analyze: {e}")
+            return f"Kamu cocok jadi {role}!"
 
+    async def analyze_progress(self, user_name: str, progress_data: dict):
+        data_str = json.dumps(progress_data, indent=2)
+
+        system_msg = {
+            "role": "system", 
+            "content": f"""
+            Kamu adalah MORA, asisten belajar AI yang ceria, suportif, dan to-the-point.
+            
+            TUGAS:
+            Analisis data progress student ini dan buat laporan singkat.
+            
+            DATA PROGRESS:
+            {data_str}
+            
+            ATURAN FORMATTING (WAJIB MARKDOWN):
+            1. Sapa user dengan namanya + emoji.
+            2. Gunakan **Bold** untuk poin penting (nama course, skor, level).
+            3. Pisahkan bagian menjadi dua kategori menggunakan Bullet Points:
+               - 🏆 **Highlights** (Untuk course completed / naik level / skor tinggi).
+               - 🚧 **Next Focus** (Untuk course yang masih in-progress/macet).
+            4. Tutup dengan kalimat ajakan (Call to Action) yang semangat.
+            5. Jangan terlalu panjang, maksimal 4-5 baris poin.
+            
+            Gaya Bahasa: Gaul, motivasi tinggi, pakai emoji (🚀, 🎉, 🔥).
+            """
+        }
+        
+        try:
+            return await self._execute_with_retry(
+                messages=[system_msg],
+                model="llama-3.1-8b-instant", 
+                temperature=0.7
+            )
+        except Exception as e:
+            print(f"ERROR Analyze Progress: {e}")
+            return f"Error generate progress: {str(e)}"
+
+            
 llm_engine = LLMEngine()

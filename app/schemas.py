@@ -86,6 +86,12 @@ class ProgressItem(BaseModel):
     progress_percent: int               # 0 - 100
     remaining_tutorials: int
 
+class ProgressData(BaseModel):
+    user_name: str
+    active_courses: List[Dict[str, Any]] # Isinya: course_name, progress_percent, dll
+    skill_updates: List[Dict[str, Any]]  # Isinya data dari skill_history
+    current_skills: List[Dict[str, Any]]
+
 # ==========================================
 # 5. PSYCH TEST SYSTEM (Fitur Baru)
 # ==========================================

@@ -19,6 +19,39 @@ models = {
     'matrix': None
 }
 
+SKILL_KEYWORDS = []
+
+@app.on_event("startup")
+def load_skill_keywords():
+    global SKILL_KEYWORDS
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(current_dir, "data", "Skill Keywords.csv")
+        df = pd.read_csv(csv_path)
+        SKILL_KEYWORDS = df['keyword'].dropna().tolist()
+        print(f"✅ Berhasil memuat {len(SKILL_KEYWORDS)} keywords skill.")
+    except Exception as e:
+        print(f"⚠️ Gagal memuat dataset keyword: {e}")
+        SKILL_KEYWORDS = []
+
+# Fungsi Pembantu: Mencari keyword dalam pesan user
+def find_keywords_in_text(user_text: str):
+    found = []
+    text_lower = " " + user_text.lower() + " " # Tambah spasi biar aman deteksi kata pendek
+    
+    for k in SKILL_KEYWORDS:
+        # Cek sederhana: Apakah keyword ada di dalam pesan?
+        # Untuk kata pendek (<3 huruf) seperti "C", "R", "Go", kita pakai spasi agar tidak match "Car" atau "Goat"
+        if len(k) < 3:
+            if f" {k.lower()} " in text_lower:
+                found.append(k)
+        else:
+            if k.lower() in text_lower:
+                found.append(k)
+                
+    # Hapus duplikat dan kembalikan
+    return list(set(found))
+
 # --- 1. STARTUP: LOAD MODEL .PKL ---
 @app.on_event("startup")
 def load_models():
@@ -132,35 +165,23 @@ def get_recommendations(user: schemas.UserProfile):
 
 @app.post("/chat/process", response_model=schemas.ChatResponse)
 async def process_chat(req: schemas.ChatRequest):
-    # 1. Ambil data role
     role_data = skill_manager.get_role_data(req.role)
     # --- [UPDATE BARU: Ektrak Silabus Lengkap] ---
     # Kita buat string rapi berisi Skill + Topik-topiknya
-    syllabus_list = []
-    if role_data:
-        for s in role_data['sub_skills']:
-            # Ambil nama skill utama
-            skill_name = s['name']
-            
-            # Kumpulkan semua exam_topics dari level beginner, intermediate, advanced
-            all_topics = []
-            for lvl_key, lvl_data in s['levels'].items():
-                topics = lvl_data.get('exam_topics', [])
-                all_topics.extend(topics)
-            
-            # Hapus duplikat topik dan gabungkan jadi string
-            unique_topics = list(set(all_topics))
-            topic_str = ", ".join(unique_topics)
-            
-            syllabus_list.append(f"TOPIC {skill_name}: [{topic_str}]")
+    found_keywords = find_keywords_in_text(req.message)
     
-    # Variable ini yang nanti dikirim ke LLM
-    syllabus_context = "\n".join(syllabus_list)
-    # ---------------------------------------------
-    skill_names = [s['name'] for s in role_data['sub_skills']] if role_data else []
+    # Siapkan context string untuk dikirim ke LLM
+    if found_keywords:
+        # Jika ketemu: "User bertanya tentang: Python, SQL"
+        keyword_context = ", ".join(found_keywords)
+        dataset_status = "FOUND"
+    else:
+        # Jika tidak ketemu
+        keyword_context = "NONE"
+        dataset_status = "NOT_FOUND"
 
     # 2. Router
-    intent = await llm_engine.process_user_intent(req.message, skill_names)
+    intent = await llm_engine.process_user_intent(req.message, [])
     
     action = intent.get('action')
     # PERUBAHAN 1: Ambil List skills, bukan single skill
@@ -214,9 +235,13 @@ async def process_chat(req: schemas.ChatRequest):
             final_reply = f"Siap! Saya siapkan {len(exam_list)} ujian untukmu: **{skill_display}**. Silakan kerjakan satu per satu di bawah ini! 👇"
             
         else:
-            # Jika user mau ujian tapi skill ga jelas
             action = "CASUAL_CHAT"
-            final_reply = await llm_engine.casual_chat(req.message, [m.dict() for m in req.history], syllabus_context)
+            final_reply = await llm_engine.casual_chat(
+            req.message, 
+            [m.dict() for m in req.history], 
+            keyword_context, 
+            dataset_status 
+        )
 
     elif action == "START_PSYCH_TEST":
         response_data = {"trigger_psych_test": True}
@@ -227,7 +252,12 @@ async def process_chat(req: schemas.ChatRequest):
         final_reply = "Sedang menganalisis kebutuhan belajarmu..."
 
     elif action == "CASUAL_CHAT":
-        final_reply = await llm_engine.casual_chat(req.message, [m.dict() for m in req.history], syllabus_context)
+        final_reply = await llm_engine.casual_chat(
+            req.message, 
+            [m.dict() for m in req.history], 
+            keyword_context, 
+            dataset_status 
+        )
 
     return schemas.ChatResponse(
         reply=final_reply,
@@ -258,36 +288,18 @@ async def submit_exam(sub: schemas.AnswerSubmission):
     )
 
 # --- 5. ENDPOINT PROGRESS ---
-@app.post("/progress")
-def get_progress(req: schemas.ProgressRequest):
-    role_data = skill_manager.get_role_data(req.role)
-    if not role_data: return []
+@app.post("/progress/analyze")
+async def get_progress_analysis(data: schemas.ProgressData):
+    # Konversi objek Pydantic ke Dictionary biasa
+    progress_dict = data.dict()
     
-    progress_report = []
-    level_weight = {"beginner": 0, "intermediate": 1, "advanced": 2}
-
-    for skill in role_data['sub_skills']:
-        skill_id = skill['id']
-        user_level = req.current_skills.get(skill_id, "beginner")
-        
-        # Hitung Persen
-        current_stage = level_weight.get(user_level, 0)
-        percent = int((current_stage / 3) * 100)
-        if user_level == "beginner": percent = 5
-        elif user_level == "intermediate": percent = 50
-        elif user_level == "advanced": percent = 80
-        
-        # Sisa tutorial (dummy/static logic karena detail ada di rekomendasi)
-        remaining = 0 
-        
-        progress_report.append({
-            "skill_name": skill['name'],
-            "current_level": user_level,
-            "progress_percent": percent,
-            "remaining_tutorials": remaining
-        })
-        
-    return progress_report
+    # Panggil LLM khusus analisis
+    analysis_text = await llm_engine.analyze_progress(
+        user_name=data.user_name, 
+        progress_data=progress_dict
+    )
+    
+    return {"analysis": analysis_text}
 
 # ==========================================
 # ENDPOINT PSIKOLOGI (JOB ROLE TEST)
